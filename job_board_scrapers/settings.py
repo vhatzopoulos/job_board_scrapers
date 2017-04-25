@@ -8,15 +8,16 @@
 #     http://doc.scrapy.org/en/latest/topics/settings.html
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
+import scrapy_proxies
 
 BOT_NAME = 'job_board_scrapers'
-
 SPIDER_MODULES = ['job_board_scrapers.spiders']
 NEWSPIDER_MODULE = 'job_board_scrapers.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'job_board_scrapers (+http://www.yourdomain.com)'
+#USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B179 Safari/7534.48.3'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -56,6 +57,14 @@ ROBOTSTXT_OBEY = False
 #    'job_board_scrapers.middlewares.MyCustomDownloaderMiddleware': 543,
 #}
 
+#################### RANDOM USER AGENTS
+DOWNLOADER_MIDDLEWARES = {
+        'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,
+        'job_board_scrapers.comm.rotate_user_agent.RotateUserAgentMiddleware' :400,
+        'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
+        #'scrapy_proxies.RandomProxy': 100,
+        #'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
+ }
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
 #EXTENSIONS = {
@@ -88,3 +97,26 @@ ROBOTSTXT_OBEY = False
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+################## PROXIES ##################
+
+# Retry many times since proxies often fail
+RETRY_TIMES = 10
+# Retry on most error codes since proxies fail for different reasons
+RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
+
+# Proxy list containing entries like
+# http://host1:port
+# http://username:password@host2:port
+# http://host3:port
+# ...
+PROXY_LIST = '/home/vas/repositories/job_board_scrapers/job_board_scrapers/list.txt'
+
+# Proxy mode
+# 0 = Every requests have different proxy
+# 1 = Take only one proxy from the list and assign it to every requests
+# 2 = Put a custom proxy to use in the settings
+PROXY_MODE = 0
+
+# If proxy mode is 2 uncomment this sentence :
+# CUSTOM_PROXY = "http://192.168.1.59:80"
