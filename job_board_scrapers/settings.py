@@ -8,7 +8,7 @@
 #     http://doc.scrapy.org/en/latest/topics/settings.html
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
-import scrapy_proxies
+#import scrapy_proxies
 
 BOT_NAME = 'job_board_scrapers'
 SPIDER_MODULES = ['job_board_scrapers.spiders']
