@@ -28,7 +28,8 @@ class ReedSpider(scrapy.Spider):
             'name': extract_with_css('header.job-header h1::text'),
             'salary': response.css("div.metadata ul li.salary::text").extract()[-1].strip(),
             'time': response.css("div.metadata ul li.time::text").extract()[-1].strip(),
-            'skills': ','.join(response.css("div.skills ul li.skill-name::text").extract())
+            'skills': ','.join(response.css("div.skills ul li.skill-name::text").extract()),
+            'sector': response.css("ul.breadcrumbs a::text").extract_first()
         }
 
 class totalJobsSpider(scrapy.Spider):
