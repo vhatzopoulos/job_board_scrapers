@@ -29,7 +29,8 @@ class ReedSpider(scrapy.Spider):
             'salary': response.css("div.metadata ul li.salary::text").extract()[-1].strip(),
             'time': response.css("div.metadata ul li.time::text").extract()[-1].strip(),
             'skills': ','.join(response.css("div.skills ul li.skill-name::text").extract()),
-            'sector': response.css("ul.breadcrumbs a::text").extract_first()
+            'sector': response.css("ul.breadcrumbs a::text").extract_first(),
+            'posted': response.css("meta[itemprop=datePosted]::attr(datetime)").extract_first()
         }
 
 class totalJobsSpider(scrapy.Spider):
