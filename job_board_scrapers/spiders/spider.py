@@ -34,23 +34,47 @@ class ReedSpider(scrapy.Spider):
         }
 
 class IndeedSpider(scrapy.Spider):
+    
     name = "indeed"
-
-    def start_requests(self):
-
-        first_page = 1
-        last_page = 2
-        start_url = 'https://www.indeed.co.uk/jobs?q=&l=uk&jt=contract&start=0'
-        urls = [start_url + str(i) for i in range(first_page, last_page + 1)]
-        for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse)
+    start_urls = ['https://www.indeed.co.uk/jobs?q=Accounting&jt=contract']
 
     def parse(self, response):
-        page = response.url.split('&')[-1]
-        filename = "indeed" + '-contractor-adds-page-%s.html' % page
-        with open(filename, 'wb') as f:
-            f.write(response.body)
-        self.log('Saved file %s' % filename)
+        # follow links to job details page
+        for href in response.css("a.jobtitle::attr(href)").extract():
+            href = 'https://www.indeed.co.uk' + href
+            yield scrapy.Request(response.urljoin(href), callback=self.parse_job_details)
+
+        # follow pagination links
+        next_page = response.css("div.pagination a::attr(href)")[-1].extract()
+        next_page = 'https://www.indeed.co.uk' + next_page
+
+        if next_page is not None:
+            next_page = response.urljoin(next_page)
+            yield scrapy.Request(next_page, callback=self.parse)
+
+    def parse_job_details(self, response):
+        def extract_with_css(query):
+            return response.css(query).extract()
+
+        def parse_date(time_ago_posted_string):
+            #how many hours or days was the job posted?
+            time_ago_posted = [int(s) for s in time_ago_posted_string.split() if s.isdigit()][0]
+            if 'day' in time_ago_posted or 'days' in time_ago_posted:
+                date_posted = datetime.now() - timedelta(days=time_ago_posted)
+            if 'hour' in time_ago_posted or 'hours' in time_ago_posted:
+                date_posted = datetime.now() - timedelta(hours=time_ago_posted)
+            return date_posted
+
+        yield {
+            'name': response.css("b.jobtitle font::text").extract_first(),
+            'company': response.css("span.company::text").extract_first(),
+            'location': response.css("span.location::text").extract_first(),
+            'salary': response.css('span[style="white-space: nowrap"]::Text').extract_first(),
+            'sector': response.css("ul.breadcrumbs a::text").extract_first(),
+            'posted': parse_date(response.css("div.result-link-bar-container span.date::text").extract_first())
+        }
+
+
 
 class totalJobsSpider(scrapy.Spider):
     name = "totaljobs"
