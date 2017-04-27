@@ -33,6 +33,25 @@ class ReedSpider(scrapy.Spider):
             'posted': response.css("meta[itemprop=datePosted]::attr(datetime)").extract_first()
         }
 
+class IndeedSpider(scrapy.Spider):
+    name = "indeed"
+
+    def start_requests(self):
+
+        first_page = 1
+        last_page = 2
+        start_url = 'https://www.indeed.co.uk/jobs?q=&l=uk&jt=contract&start=0'
+        urls = [start_url + str(i) for i in range(first_page, last_page + 1)]
+        for url in urls:
+            yield scrapy.Request(url=url, callback=self.parse)
+
+    def parse(self, response):
+        page = response.url.split('&')[-1]
+        filename = "indeed" + '-contractor-adds-page-%s.html' % page
+        with open(filename, 'wb') as f:
+            f.write(response.body)
+        self.log('Saved file %s' % filename)
+
 class totalJobsSpider(scrapy.Spider):
     name = "totaljobs"
     sectors = ['accountancy','administration', 'advertising']
@@ -64,24 +83,7 @@ class totalJobsSpider(scrapy.Spider):
             'hiringOrganization': response.css("div[property=hiringOrganization] a::text").extract()[0]
         }
 
-class IndeedSpider(scrapy.Spider):
-    name = "indeed"
 
-    def start_requests(self):
-
-        first_page = 1
-        last_page = 2
-        start_url = 'https://www.indeed.co.uk/jobs?q=&l=uk&jt=contract&start=0'
-        urls = [start_url + str(i) for i in range(first_page, last_page + 1)]
-        for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse)
-
-    def parse(self, response):
-        page = response.url.split('&')[-1]
-        filename = "indeed" + '-contractor-adds-page-%s.html' % page
-        with open(filename, 'wb') as f:
-            f.write(response.body)
-        self.log('Saved file %s' % filename)
 
 class CareerBuilderSpider(scrapy.Spider):
     name = "careerbuilder"
