@@ -1,42 +1,10 @@
 import scrapy
 from datetime import datetime, timedelta
 
-class MonsterSpider(scrapy.Spider):
-    name = "monster"
-
-    def start_requests(self):
-
-        first_page = 1
-        last_page = 2
-        start_urls = 'https://www.monster.co.uk/jobs/search/Contract_8?cy=uk&page='
-        urls = [start_url + str(i) for i in range(first_page, last_page + 1)]
-        for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse)
-
-    def parse(self, response):
-        '''
-        page = response.url.split('&')[1]
-        filename = 'monster-contractor-%s.html' % page
-        with open(filename, 'wb') as f:
-            f.write(response.body)
-        self.log('Saved file %s' % filename)
-        '''
-        '''
-        for job in response.css('div.jobTitle'):
-            yield {
-                'add_url': job.css("h2 a::attr(href)").extract()[0]
-            }
-        '''
-        # follow links to job details page
-        for href in response.css("div.jobTitle h2 a::attr(href)").extract():
-            yield scrapy.Request(response.urljoin(href), callback=self.parse_job_details)
-
-    def parse_job_details(self, response):
-        pass
 
 class ReedSpider(scrapy.Spider):
     name = "reed"
-    start_urls = ['https://www.reed.co.uk/jobs/contract']
+    start_urls = ['https://www.reed.co.uk/jobs/education?contract=True', 'https://www.reed.co.uk/jobs/it-jobs?contract=True', 'https://www.reed.co.uk/jobs/health-jobs?contract=True', 'https://www.reed.co.uk/jobs/construction-property?contract=True', 'https://www.reed.co.uk/jobs/admin-secretarial-pa?contract=True','https://www.reed.co.uk/jobs/logistics?contract=True', 'https://www.reed.co.uk/jobs/social-care?contract=True', 'https://www.reed.co.uk/jobs/engineering?contract=True', 'https://www.reed.co.uk/jobs/accountancy?contract=True', 'https://www.reed.co.uk/jobs/hr-jobs?contract=True', 'https://www.reed.co.uk/jobs/accountancy-qualified?contract=True', 'https://www.reed.co.uk/jobs/marketing?contract=True', 'https://www.reed.co.uk/jobs/customer-service?contract=True','https://www.reed.co.uk/jobs/factory?contract=True', 'https://www.reed.co.uk/jobs/catering-jobs?contract=True', 'https://www.reed.co.uk/jobs/sales?contract=True', 'https://www.reed.co.uk/jobs/finance?contract=True', 'https://www.reed.co.uk/jobs/law?contract=True', 'https://www.reed.co.uk/jobs/banking?contract=True', 'https://www.reed.co.uk/jobs/media-digital-creative?contract=True', 'https://www.reed.co.uk/jobs/science?contract=True', 'https://www.reed.co.uk/jobs/purchasing?contract=True', 'https://www.reed.co.uk/jobs/retail?contract=True', 'https://www.reed.co.uk/jobs/motoring-automotive?contract=True', 'https://www.reed.co.uk/jobs/strategy-consultancy?contract=True', 'https://www.reed.co.uk/jobs/charity?contract=True', 'https://www.reed.co.uk/jobs/graduate-training-internships?contract=True', 'https://www.reed.co.uk/jobs/security-safety?contract=True', 'https://www.reed.co.uk/jobs/fmcg?contract=True', 'https://www.reed.co.uk/jobs/recruitment-consultancy?contract=True', 'https://www.reed.co.uk/jobs/leisure-tourism?contract=True', 'https://www.reed.co.uk/jobs/energy?contract=True', 'https://www.reed.co.uk/jobs/general-insurance?contract=True', 'https://www.reed.co.uk/jobs/training?contract=True', 'https://www.reed.co.uk/jobs/estate-agent?contract=True', 'https://www.reed.co.uk/jobs/apprenticeships?contract=True', 'https://www.reed.co.uk/jobs/other?contract=True']
 
     def parse(self, response):
         # follow links to job details page
@@ -190,3 +158,23 @@ class jobsiteSpider(scrapy.Spider):
 
 
 
+class MonsterSpider(scrapy.Spider):
+    name = "monster"
+
+    def start_requests(self):
+
+        first_page = 1
+        last_page = 2
+        start_urls = 'https://www.monster.co.uk/jobs/search/Contract_8?cy=uk&page='
+        urls = [start_url + str(i) for i in range(first_page, last_page + 1)]
+        for url in urls:
+            yield scrapy.Request(url=url, callback=self.parse)
+
+    def parse(self, response):
+       
+        # follow links to job details page
+        for href in response.css("div.jobTitle h2 a::attr(href)").extract():
+            yield scrapy.Request(response.urljoin(href), callback=self.parse_job_details)
+
+    def parse_job_details(self, response):
+        pass
