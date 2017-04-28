@@ -149,7 +149,31 @@ class CareerBuilderSpider(scrapy.Spider):
 
 class cwJobsSpider(scrapy.Spider):
     name = "cwjobs"
-    start_urls = ['https://www.cwjobs.co.uk/jobs/contract/']
+    start_urls = ['https://www.cwjobs.co.uk/jobs/contract']
+
+    def parse(self, response):
+        # follow links to job details page
+        for href in response.css("meta[property=url]::attr(content)").extract():
+            yield scrapy.Request(response.urljoin(href), callback=self.parse_job_details)
+
+        # follow pagination links
+        next_page = start_urls[0] + response.css("a.next::attr(href)").extract()[0]
+        
+        if next_page is not None:
+            next_page = response.urljoin(next_page)
+            yield scrapy.Request(next_page, callback=self.parse)
+
+    def parse_job_details(self, response):
+
+        yield{
+            'job_title': response.css("h1::text").extract()[0].strip(),
+            'location':  response.css("meta[property=addressLocality]::attr(content)").extract()[0] +', ' +response.css("meta[property=addressRegion]::attr(content)").extract()[0],
+            'salary': response.css("div[property=baseSalary]::text").extract_first(),
+            'hiringOrganization': response.css("div[property=hiringOrganization] meta[property=name]::attr(content)").extract_first(),
+            'date_posted':  response.css("meta[property=datePosted]::attr(content)").extract_first()
+
+
+        }
 
 
 class cvLibrarySpider(scrapy.Spider):
