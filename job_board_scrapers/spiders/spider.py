@@ -167,9 +167,15 @@ class cwJobsSpider(scrapy.Spider):
 
     def parse_job_details(self, response):
 
+        location ='N/A'
+        try:
+            location = response.css("meta[property=addressLocality]::attr(content)").extract()[0] +', ' +response.css("meta[property=addressRegion]::attr(content)").extract()[0]
+        except IndexError:
+            pass
+
         yield{
             'job_title': response.css("h1::text").extract()[0].strip(),
-            'location':  response.css("meta[property=addressLocality]::attr(content)").extract()[0] +', ' +response.css("meta[property=addressRegion]::attr(content)").extract()[0],
+            'location':  location,
             'salary': response.css("div[property=baseSalary]::text").extract_first(),
             'hiringOrganization': response.css("div[property=hiringOrganization] meta[property=name]::attr(content)").extract_first(),
             'date_posted':  response.css("meta[property=datePosted]::attr(content)").extract_first()
