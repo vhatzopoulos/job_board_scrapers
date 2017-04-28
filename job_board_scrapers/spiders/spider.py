@@ -149,15 +149,17 @@ class CareerBuilderSpider(scrapy.Spider):
 
 class cwJobsSpider(scrapy.Spider):
     name = "cwjobs"
-    start_urls = ['https://www.cwjobs.co.uk/jobs/contract']
+    start_urls = ['https://www.cwjobs.co.uk/jobs/contract/']
 
-    def parse(self, response):
+    def parse(self, response, start_urls=start_urls):
         # follow links to job details page
         for href in response.css("meta[property=url]::attr(content)").extract():
             yield scrapy.Request(response.urljoin(href), callback=self.parse_job_details)
 
         # follow pagination links
         next_page = start_urls[0] + response.css("a.next::attr(href)").extract()[0]
+        next_page = response.css("a.next::attr(href)").extract()[0]
+        
         
         if next_page is not None:
             next_page = response.urljoin(next_page)
