@@ -78,8 +78,8 @@ class IndeedSpider(scrapy.Spider):
 
 class totalJobsSpider(scrapy.Spider):
     name = "totaljobs"
-    sectors = ['accountancy','administration', 'advertising']
-    start_urls = ['https://www.totaljobs.com/jobs/contract/'+sectors[0]]
+    sectors = ['accountancy','administration', 'advertising', 'aerospace', 'apprenticeship','automotive', 'banking', 'call-centre', 'catering', 'charity', 'civil-service', 'construction', 'creative', 'customer-service', 'digital', 'education', 'engineering', 'finance', 'fmcg', 'graduate', 'healthcare', 'hospitality', 'hr', 'insurance', 'it', 'legal', 'leisure', 'logistics', 'management-consultancy', 'manufacturing', 'marketing', 'media', 'nursing', 'oil-and-gas', 'pa', 'part-time', 'pharmaceuticals', 'pr', 'property', 'public-sector', 'recruitment-sales', 'renewable-energy', 'retail', 'sales', 'science', 'secretarial', 'senior-appointments', 'social-work', 'teaching', 'telecoms', 'temporary', 'tourism', 'transport', 'travel', 'utilities', 'wholesale'] 
+    start_urls = ['https://www.totaljobs.com/jobs/contract/' + sector for sector in sectors]
 
     def parse(self, response):
         # follow links to job details page
@@ -89,7 +89,7 @@ class totalJobsSpider(scrapy.Spider):
 
         # follow pagination links
         next_page = response.css('a.next::attr(href)').extract()[-1]
-        next_page = 'https://www.totaljobs.com/jobs/contract/' + sectors[0] + next_page
+        next_page = response.url + next_page
 
         if next_page is not None:
             next_page = response.urljoin(next_page)
@@ -173,7 +173,7 @@ class cwJobsSpider(scrapy.Spider):
         except IndexError:
             pass
 
-        yield{
+        yield {
             'job_title': response.css("h1::text").extract()[0].strip(),
             'location':  location,
             'salary': response.css("div[property=baseSalary]::text").extract_first(),
