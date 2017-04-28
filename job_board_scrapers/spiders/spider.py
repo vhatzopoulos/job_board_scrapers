@@ -75,7 +75,6 @@ class IndeedSpider(scrapy.Spider):
         }
 
 
-
 class totalJobsSpider(scrapy.Spider):
     name = "totaljobs"
     sectors = ['accountancy','administration', 'advertising', 'aerospace', 'apprenticeship','automotive', 'banking', 'call-centre', 'catering', 'charity', 'civil-service', 'construction', 'creative', 'customer-service', 'digital', 'education', 'engineering', 'finance', 'fmcg', 'graduate', 'healthcare', 'hospitality', 'hr', 'insurance', 'it', 'legal', 'leisure', 'logistics', 'management-consultancy', 'manufacturing', 'marketing', 'media', 'nursing', 'oil-and-gas', 'pa', 'part-time', 'pharmaceuticals', 'pr', 'property', 'public-sector', 'recruitment-sales', 'renewable-energy', 'retail', 'sales', 'science', 'secretarial', 'senior-appointments', 'social-work', 'teaching', 'telecoms', 'temporary', 'tourism', 'transport', 'travel', 'utilities', 'wholesale'] 
@@ -209,11 +208,31 @@ class jobsiteSpider(scrapy.Spider):
         def extract_with_css(query):
             return response.css(query).extract()
 
+        try:
+            name = response.css("span.title h1::text").extract()[0].strip()
+        except IndexError:
+            name = 'N/A'
+
+        try:
+            addressLocality = response.css("span.locationConcat::text").extract()[0]
+        except IndexError:
+            addressLocality = 'N/A'
+
+        try:
+            salary = response.css("span.salary::text").extract()[0].strip()
+        except IndexError:
+            salary = 'N/A'
+
+        try:
+            jobType = response.css("span.jobType::text").extract()[0]
+        except IndexError:
+            jobType = 'N/A'
+
         yield {
-            'name': response.css("span.title h1::text").extract()[0].strip(),
-            'addressLocality': response.css("span.locationConcat::text").extract()[0],
-            'salary': response.css("span.salary::text").extract()[0].strip(),
-            'jobType': response.css("span.jobType::text").extract()[0]
+            'name': name,
+            'addressLocality': addressLocality,
+            'salary': salary,
+            'jobType': jobType
             }
 
 
