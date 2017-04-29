@@ -183,9 +183,35 @@ class cwJobsSpider(scrapy.Spider):
         }
 
 
-class cvLibrarySpider(scrapy.Spider):
-    name = "cvlibrary"
-    start_urls = ['']
+
+class fish4Spider(scrapy.Spider):
+    name = "fish4"
+    start_urls = ['http://www.fish4.co.uk/jobs/contract/#browsing']
+
+    def parse(self, response, start_urls=start_urls):
+        # follow links to job details page
+        for href in response.css("a.js-clickable-area-link::attr(href)").extract():
+            href = 'http://www.fish4.co.uk' + href
+            yield scrapy.Request(response.urljoin(href), callback=self.parse_job_details)
+
+        #follow pagination links
+        next_page = response.css("a[rel=next]::attr(href)").extract()[0]
+        next_page = 'http://www.fish4.co.uk' + next_page
+        if next_page is not None:
+            next_page = response.urljoin(next_page)
+            yield scrapy.Request(next_page, callback=self.parse)
+
+    def parse_job_details(self, response):
+
+        keys = response.css("dt.grid-item.two-fifths.portable-one-whole.palm-one-half::text").extract()
+        keys = list(map( lambda item :item.strip(), keys))
+        values = response.css("dd.grid-item.three-fifths.portable-one-whole.palm-one-half::text").extract()
+        values = list(map( lambda item :item.strip(), values))
+
+        yield dict(zip(keys, values))
+
+
+response.css("a.js-clickable-area-link::attr(href)").extract()
 
 class jobsiteSpider(scrapy.Spider):
     name = "jobsite"
@@ -236,7 +262,7 @@ class jobsiteSpider(scrapy.Spider):
             }
 
 
-
+########################## junk ##########################
 class MonsterSpider(scrapy.Spider):
     name = "monster"
 
@@ -257,3 +283,13 @@ class MonsterSpider(scrapy.Spider):
 
     def parse_job_details(self, response):
         pass
+
+# return 204 on get request
+class cvLibrarySpider(scrapy.Spider):
+    name = "cvlibrary"
+    start_urls = ['https://www.cv-library.co.uk/search-jobs?search=1&q=&geo=&distance=15&salarymin=&salarymax=&salarytype=annum&posted=28&industry=25&tempperm=Contract']
+
+    def parse(self, response, start_urls=start_urls):
+        # follow links to job details page
+        for href in response.css("div.a::attr(href)").extract():
+            yield scrapy.Request(response.urljoin(href), callback=self.parse_job_details)
