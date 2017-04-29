@@ -98,12 +98,40 @@ class totalJobsSpider(scrapy.Spider):
         def extract_with_css(query):
             return response.css(query).extract()
 
+        try:
+            name = response.css("h1::text").extract()[0].strip()
+        except IndexError:
+            name = 'N/A'
+        try:
+            addressLocality = response.css("meta[property=addressLocality]::attr(content)").extract()[0]
+        except IndexError:
+            addressLocality = 'N/A'
+        try:
+             'hiringOrganization' = response.css("div[property=hiringOrganization] a::text").extract()[0]
+        except IndexError:
+            hiringOrganization = 'N/A'
+        try:
+             'salary' = response.css("div[property=baseSalary]::text").extract()[0]
+        except IndexError:
+            salary = 'N/A'
+
+        try:
+            datePosted = response.css("meta[property=datePosted]::attr(content)").extract()[0].strip()
+        except IndexError:
+            datePosted = 'N/A'
+
+        try:
+            employmentType = response.css("div[property=employmentType]::text").extract()[0]
+        except IndexError:
+            employmentType = 'N/A'
+
         yield {
-            'name': response.css("h1::text").extract()[0].strip(),
-            'addressLocality': response.css("meta[property=addressLocality]::attr(content)").extract()[0],
-            'salary': response.css("div[property=baseSalary]::text").extract()[0],
-            #'employmentType': response.css("div[property=employmentType]::text").extract()[0],
-            'hiringOrganization': response.css("div[property=hiringOrganization] a::text").extract()[0]
+            'name': name,
+            'addressLocality': addressLocality,
+            'salary': salary,
+            'employmentType': employmentType,
+            'hiringOrganization': hiringOrganization,
+            'datePosted': datePosted
         }
 
 
