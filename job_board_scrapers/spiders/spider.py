@@ -107,11 +107,11 @@ class totalJobsSpider(scrapy.Spider):
         except IndexError:
             addressLocality = 'N/A'
         try:
-             'hiringOrganization' = response.css("div[property=hiringOrganization] a::text").extract()[0]
+             hiringOrganization = response.css("div[property=hiringOrganization] a::text").extract()[0]
         except IndexError:
             hiringOrganization = 'N/A'
         try:
-             'salary' = response.css("div[property=baseSalary]::text").extract()[0]
+             salary = response.css("div[property=baseSalary]::text").extract()[0]
         except IndexError:
             salary = 'N/A'
 
