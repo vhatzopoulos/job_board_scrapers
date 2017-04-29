@@ -211,7 +211,7 @@ class fish4Spider(scrapy.Spider):
         yield dict(zip(keys, values))
 
 
-response.css("a.js-clickable-area-link::attr(href)").extract()
+
 
 class jobsiteSpider(scrapy.Spider):
     name = "jobsite"
