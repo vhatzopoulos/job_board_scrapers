@@ -58,6 +58,7 @@ ROBOTSTXT_OBEY = False
 #}
 
 #################### RANDOM USER AGENTS
+
 DOWNLOADER_MIDDLEWARES = {
         'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,
         'job_board_scrapers.comm.rotate_user_agent.RotateUserAgentMiddleware' :400,
@@ -65,6 +66,7 @@ DOWNLOADER_MIDDLEWARES = {
         #'scrapy_proxies.RandomProxy': 100,
         #'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
  }
+ 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
 #EXTENSIONS = {
